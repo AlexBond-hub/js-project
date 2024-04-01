@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>user-details.html</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        div.mainUserDiv {
+            width: 500px;
+            background-color: #55a3c5;
+            border-radius: 15px;
+            border: 2px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+        }
+
+        .postButton {
+            width: 90%;
+            height: 40px;
+            background-color: #6b9dda;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 20px;
+
+        }
+
+        .mainPostDiv {
+            height: 650px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        p.titlePost {
+            display: flex;
+            width: 18%;
+            height: 40%;
+            margin: 10px;
+            background-color: #8ec210;
+            border-radius: 15px;
+            border: 2px solid black;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .btnPost {
+            width: 40%;
+            height: 30px;
+            margin-top: 30px;
+            border-radius: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+<script>
+
+    let userId = new URL(location.href).searchParams.get('id')
+    let newURL = 'https://jsonplaceholder.typicode.com/users/' + userId;
+    fetch(newURL).then(res => res.json())
+        .then(data => {
+            // const {lat, lng} = geo;
+            console.log(data);
+            let mainUser = document.createElement('div');
+            mainUser.classList.add('mainUserDiv');
+            document.body.append(mainUser);
+            for (const resultKey in data) {
+                if (resultKey === 'address' || resultKey === 'company') {
+                    for (const key in data[resultKey]) {
+                        let p = document.createElement('p');
+                        mainUser.append(p);
+                        p.innerText = `${key}:${data[resultKey][key]}`;
+                        if (key === 'geo') {
+                            let div = document.createElement('div');
+                            div.innerText = `${key}`;
+                            p.appendChild(div);
+
+                            for (const ky in data[resultKey][key]) {
+                                // let ul = document.createElement('ul');
+                                // p.append(ul);
+                                // let li = document.createElement('li');
+                                // li.innerText = `${ky}:${data[resultKey][key][ky]}`;
+                                // ul.append(li);
+                                let div = document.createElement('div');
+                                div.innerText = `${ky}:${data[resultKey][key][ky]}`;
+                                p.appendChild(div);
+                            }
+                        }
+                    }
+                } else {
+                    let div = document.createElement('div');
+                    mainUser.append(div);
+                    div.innerText = `${resultKey}:${data[resultKey]}`;
+                }
+            }
+
+            let but = document.createElement('button');
+            but.classList.add('postButton');
+            document.body.append(but);
+            but.innerText = 'post of current user';
+            but.onclick = function () {
+                fetch('https://jsonplaceholder.typicode.com/posts?userId=' + userId)
+                    .then(res => res.json())
+                    .then(posts => {
+                        let postDiv = document.createElement('div');
+                        postDiv.classList.add('mainPostDiv');
+                        document.body.appendChild(postDiv);
+                        for (const post of posts) {
+
+                            let p = document.createElement('p');
+                            p.classList.add('titlePost')
+                            p.innerHTML = `${post.title}`;
+                            postDiv.appendChild(p)
+                            let btn = document.createElement('button');
+                            btn.classList.add('btnPost');
+                            btn.innerText = 'info';
+                            p.appendChild(btn);
+                            btn.addEventListener('click', () => {
+                                location.href = 'post-details.html?postId=' + post.id;
+                                console.log(post.id);
+                            })
+                        }
+                    })
+            }
+        })
+
+
+</script>
+</body>
+</html>
